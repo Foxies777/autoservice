@@ -113,9 +113,6 @@ const Auth = observer(() => {
                     <>
                         <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Подтвердите пароль" />
                         {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
-
-                        <input type="file" name="avatar" onChange={handleChange} />
-                        {errors.avatar && <p>{errors.avatar}</p>}
                     </>
                 )}
                 <button type="submit">{isLogin ? 'Войти' : 'Зарегистрироваться'}</button>
