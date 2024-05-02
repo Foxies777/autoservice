@@ -16,6 +16,7 @@ export const registration = async (formData) => {
     for (let pair of formPayload.entries()) {
         console.log(`${pair[0]}: ${pair[1]}`);
     }
+    console.log('Form: ', formPayload);
     try {
         const { data } = await $host.post('api/user/registration', formPayload, {
             headers: {
