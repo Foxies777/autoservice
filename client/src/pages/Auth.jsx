@@ -15,16 +15,15 @@ const Auth = observer(() => {
         email: '',
         username: '',
         password: '',
-        confirmPassword: '',
-        avatar: null
+        confirmPassword: ''
     });
     const [errors, setErrors] = useState({});
 
     const handleChange = e => {
-        const { name, value, files } = e.target;
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [name]: files ? files[0] : value
+            [name]: value
         });
     };
 
@@ -32,21 +31,23 @@ const Auth = observer(() => {
         const errors = {};
         if (!isLogin) {
             if (!formData.fullName) {
-                errors.fullName = 'Full name is required.';
+                errors.fullName = 'Полное имя обязательно.';
             }
             if (!formData.email.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
-                errors.email = 'Invalid email address.';
+                errors.email = 'Некорректный адрес электронной почты.';
             }
             if (formData.username.length < 3) {
-                errors.username = 'Username must be at least 3 characters long.';
+                errors.username = 'Имя пользователя должно быть не менее 3 символов.';
             }
             if (formData.password.length < 6) {
-                errors.password = 'Password must be at least 6 characters long.';
+                errors.password = 'Пароль должен быть не менее 6 символов.';
+            }
+            if (formData.password !== formData.confirmPassword) {
+                errors.confirmPassword = 'Пароли не совпадают.';
             }
         }
         return errors;
     };
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -55,43 +56,29 @@ const Auth = observer(() => {
             try {
                 let data;
                 if (isLogin) {
-                    console.log(data);
                     data = await login(formData.username, formData.password);
                     user.setUser(data.user);
                     user.setIsAuth(true);
                     navigate(user.isAdmin ? ADMIN_ROUTE : HOME_ROUTE);
                 } else {
-                    const formDataToSend = {
+                    data = await registration({
                         fullName: formData.fullName,
                         email: formData.email,
                         username: formData.username,
-                        password: formData.password,
-                        confirmPassword: formData.confirmPassword,
-                        avatar: formData.avatar
-                    };
-                    data = await registration(formDataToSend);
+                        password: formData.password
+                    });
                     user.setUser(data.user);
                     user.setIsAuth(true);
                     navigate(HOME_ROUTE);
                 }
             } catch (error) {
-                if (error.response && error.response.data && error.response.data.errors) {
-                    const newErrors = {};
-                    error.response.data.errors.forEach(err => {
-                        newErrors[err.path] = err.message;
-                    });
-                    setErrors(newErrors);
-                } else {
-                    alert(error.message || 'Произошла ошибка');
-                }
+                const newErrors = error.response && error.response.data && error.response.data.errors ? error.response.data.errors : {general: error.message || 'Произошла ошибка'};
+                setErrors(newErrors);
             }
         } else {
-            console.log(formErrors);
             setErrors(formErrors);
         }
     };
-
-
 
     return (
         <div>
@@ -99,13 +86,13 @@ const Auth = observer(() => {
             <form onSubmit={handleSubmit}>
                 {!isLogin && (
                     <>
-                        <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="ФИО" />
+                        <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Полное имя" />
                         {errors.fullName && <p>{errors.fullName}</p>}
-                        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" />
+                        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Электронная почта" />
                         {errors.email && <p>{errors.email}</p>}
                     </>
                 )}
-                <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Логин" />
+                <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Имя пользователя" />
                 {errors.username && <p>{errors.username}</p>}
                 <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Пароль" />
                 {errors.password && <p>{errors.password}</p>}
@@ -122,4 +109,4 @@ const Auth = observer(() => {
     );
 });
 
-export default Auth;
+export default Auth

@@ -15,7 +15,6 @@ const UserBookings = () => {
         }
     }, [user.user.id]);
 
-    // Функция для отображения статуса заявки в виде бейджа
     const renderStatusBadge = (status) => {
         let variant;
         switch (status) {

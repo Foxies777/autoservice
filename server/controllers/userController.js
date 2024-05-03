@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const ApiError = require('../error/ApiError');
 const { User } = require('../models/models');
 require('dotenv').config();
-
 const generateJWT = (id, username, email, role) => {
   return jwt.sign({ id, username, email, role },
     process.env.SECRET_KEY,
